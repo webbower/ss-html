@@ -46,7 +46,7 @@ To generate a tag in your PHP code, use `HTML::tag($tagname, $content, $attrs)` 
 
 Used to override the default `SiteTree::MetaTags()` template method in your Page.php file. This example will output a meta-charset tag appropriate to the version of (X)HTML you're using, output the title tag if requested (in the best practice order), and apply trailing slashes to the meta tags if appropriate.
 
-```php
+```PHP
 public function MetaTags($includeTitle = true) {
 	$tags = "";
 
