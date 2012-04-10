@@ -35,6 +35,7 @@ To get the current profile, use `HTML::get_profile()`.
 You can output the appropriate DOCTYPE with `HTML::doctype()`.
 
 To generate a tag in your PHP code, use `HTML::tag($tagname, $content, $attrs)` where:
+
 * `$tagname` is the name of the tag
 * `$content` is the tag content. Pass in empty string for empty tags (this arg will be ignored for empty tags anyway).
 * `$attrs` is an array of key/value pairs that will be turned into HTML attributes. For boolean attributes (ones where the value repeats the key for XML compliance, e.g. `selected` for select menus) will be output as appropriate based on the selected profile.
