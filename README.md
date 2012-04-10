@@ -47,43 +47,48 @@ To generate a tag in your PHP code, use `HTML::tag($tagname, $content, $attrs)` 
 Used to override the default `SiteTree::MetaTags()` template method in your Page.php file. This example will output a meta-charset tag appropriate to the version of (X)HTML you're using, output the title tag if requested (in the best practice order), and apply trailing slashes to the meta tags if appropriate.
 
 ```PHP
-public function MetaTags($includeTitle = true) {
-	$tags = "";
+<?php
+class Page extend SiteTree {
+	// ...
+	public function MetaTags($includeTitle = true) {
+		$tags = "";
 
-	$charset = ContentNegotiator::get_encoding();
-	if(strpos(HTML::get_profile(), 'html5') === 0) {
-		$tags .= HTML::tag('meta', '', array('charset' => $charset)) . "\n";
-	} else {
-		$tags .= HTML::tag('meta', '', array(
-			'http-equiv' => 'Content-Type',
-			'content' => "text/html; charset=$charset",
-		)) . "\n";
-	}
+		$charset = ContentNegotiator::get_encoding();
+		if(strpos(HTML::get_profile(), 'html5') === 0) {
+			$tags .= HTML::tag('meta', '', array('charset' => $charset)) . "\n";
+		} else {
+			$tags .= HTML::tag('meta', '', array(
+				'http-equiv' => 'Content-Type',
+				'content' => "text/html; charset=$charset",
+			)) . "\n";
+		}
 	
-	if($includeTitle === true || $includeTitle == 'true') {
-		$tags .= HTML::tag('title', Convert::raw2xml(($this->MetaTitle) ? $this->MetaTitle : $this->Title)) . "\n";
-	}
+		if($includeTitle === true || $includeTitle == 'true') {
+			$tags .= HTML::tag('title', Convert::raw2xml(($this->MetaTitle) ? $this->MetaTitle : $this->Title)) . "\n";
+		}
 
-	if($this->MetaKeywords) {
-		$tags .= HTML::tag('meta', '', array(
-			'name' => 'keywords',
-			'content' => Convert::raw2att($this->MetaKeywords),
-		)) . "\n";
-	}
-	if($this->MetaDescription) {
-		$tags .= HTML::tag('meta', '', array(
-			'name' => 'description',
-			'content' => Convert::raw2att($this->MetaDescription),
-		)) . "\n";
-	}
-	if($this->ExtraMeta) { 
-		$tags .= $this->ExtraMeta . "\n";
-	} 
+		if($this->MetaKeywords) {
+			$tags .= HTML::tag('meta', '', array(
+				'name' => 'keywords',
+				'content' => Convert::raw2att($this->MetaKeywords),
+			)) . "\n";
+		}
+		if($this->MetaDescription) {
+			$tags .= HTML::tag('meta', '', array(
+				'name' => 'description',
+				'content' => Convert::raw2att($this->MetaDescription),
+			)) . "\n";
+		}
+		if($this->ExtraMeta) { 
+			$tags .= $this->ExtraMeta . "\n";
+		} 
 
-	$this->extend('MetaTags', $tags);
+		$this->extend('MetaTags', $tags);
 
-	return $tags;
+		return $tags;
+	}
 }
+?>
 ```
 
 ## TODO
