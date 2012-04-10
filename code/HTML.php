@@ -26,17 +26,30 @@ class HTML extends Object {
 		'html4',
 		'xhtml1-trans',
 		'xhtml1-strict',
-		'xhtml11'
+		'xhtml11',
 	);
 	
-	static public function tag($name, $content='', $attrs=array()) {
-		$tag = "<{$name}";
+	static private function attrs($attrs=array()) {
+		$out = '';
+		foreach($attrs as $name => $value) {
+			$out .= " {$name}=\"{$value}\"";
+		}
+		return $out;
+	}
+
+	static private function is_empty_tag($name) {
+		return isset(self::$empty_tags[$name]);
+	}
+
+	// PUBLIC METHODS
+	static public function tag($tagname, $content='', $attrs=array()) {
+		$tag = "<{$tagname}";
 
 		if(count($attrs) > 0) {
 			$tag .= self::attrs($attrs);
 		}
 		
-		if(self::is_empty_tag($name)) {
+		if(self::is_empty_tag($tagname)) {
 			if(self::$xml) {
 				$tag .= self::$xml_empty_closer;
 			}
@@ -49,18 +62,10 @@ class HTML extends Object {
 			if($content) {
 				$tag .= $content;
 			}
-			$tag .= "</{$name}>";
+			$tag .= "</{$tagname}>";
 		}
 		
 		return $tag;
-	}
-	
-	static private function attrs($attrs=array()) {
-		$out = '';
-		foreach($attrs as $name => $value) {
-			$out .= " {$name}=\"{$value}\"";
-		}
-		return $out;
 	}
 	
 	static public function doctype() {
@@ -89,10 +94,6 @@ class HTML extends Object {
 		}
 		
 		return $doctype;
-	}
-	
-	static private function is_empty_tag($name) {
-		return isset(self::$empty_tags[$name]);
 	}
 	
 	static public function set_profile($profile) {
