@@ -2,17 +2,32 @@
 
 class HTML extends Object {
 	
-	private static $version = 'html5';
+	private static $profile = 'xhtml11';
 	
-	private static $doctype = 'trans';
-	
-	private static $xml = false;
+	private static $xml = true;
 
 	private static $xml_empty_closer = ' /';
 
-	private static $empty_tags = array('img' => 1, 'br' => 1, 'hr' => 1, 'meta' => 1);
+	private static $single_boolean_attrs = false;
+
+	private static $attr_quotes_optional = false;
+
+	private static $empty_tags = array(
+		'img' => true,
+		'br' => true,
+		'hr' => true,
+		'meta' => true,
+		'embed' => true,
+	);
 	
-	private static $supported_versions = array('html5', 'html4', 'xhtml1', 'xhtml11');
+	private static $supported_profiles = array(
+		'html5',
+		'html5-xml',
+		'html4',
+		'xhtml1-trans',
+		'xhtml1-strict',
+		'xhtml11'
+	);
 	
 	static public function tag($name, $content='', $attrs=array()) {
 		$tag = "<{$name}";
@@ -42,64 +57,71 @@ class HTML extends Object {
 	
 	static private function attrs($attrs=array()) {
 		$out = '';
-		foreach ($attrs as $name => $value) {
+		foreach($attrs as $name => $value) {
 			$out .= " {$name}=\"{$value}\"";
 		}
 		return $out;
 	}
 	
+	static public function doctype() {
+		$doctype = '';
+
+		switch(self::$profile) {
+			case 'html5':
+			case 'html5-xml':
+				$doctype = '<!DOCTYPE html>';
+				break;
+			case 'xhtml11':
+				$doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">';
+				break;
+			case 'xhtml1-strict':
+				$doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
+				break;
+			case 'xhtml1-trans':
+				$doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
+				break;
+			case 'html4-trans':
+				$doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">';
+				break;
+			case 'html4-strict':
+				$doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">';
+				break;
+		}
+		
+		return $doctype;
+	}
+	
 	static private function is_empty_tag($name) {
 		return isset(self::$empty_tags[$name]);
 	}
-
-	static public function is_html5() {
-		return self::get_version() == 'html5';
-	}
 	
-	static public function is_html4() {
-		return self::get_version() == 'html4';
-	}
-	
-	static public function is_xhtml1() {
-		return self::get_version() == 'xhtml1';
-	}
-	
-	static public function is_xhtml11() {
-		return self::get_version() == 'xhtml11';
-	}
-	
-	static public function set_version($version) {
-		if(!in_array($version, self::$supported_versions)) {
+	static public function set_profile($profile) {
+		if(!in_array($profile, self::$supported_profiles)) {
 			return false;
 		}
 		
-		if(strpos($version, 'xhtml') !== false) {
-			self::$xml = true;
-		} else {
-			self::$xml = false;
+		switch(self::$profile) {
+			case 'html5':
+			case 'html4-strict':
+			case 'html4-trans':
+				self::$xml = false;
+				self::$single_boolean_attrs = true;
+				self::$attr_quotes_optional = true;
+				break;
+			case 'html5-xml':
+			case 'xhtml11':
+			case 'xhtml1-strict':
+			case 'xhtml1-trans':
+				self::$xml = true;
+				self::$single_boolean_attrs = false;
+				self::$attr_quotes_optional = false;
+				break;
 		}
-		
-		self::$version = $version;
+
+		self::$profile = $profile;
 	}
 
-	static public function get_version() {
-		return self::$version;
+	static public function get_profile() {
+		return self::$profile;
 	}
-	
-	static public function set_xml($bool) {
-		if(self::is_html4()) {
-			self::$xml = false;
-		} else {
-			self::$xml = (bool)$bool;
-		}
-	}
-	
-	static public function get_xml() {
-		return self::$xml;
-	}
-	
-	static public function is_xml() {
-		return self::get_xml();
-	}
-	
 }
